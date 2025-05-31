@@ -1,4 +1,4 @@
-i" glow.vim - Autoload functions
+" glow.vim - Autoload functions
 " Author: Maxim4711
 " Version: 1.0
 
