@@ -1,3 +1,8 @@
+" glow.vim - Autoload functions
+" Author: Maxim4711
+" Version: 1.0
+
+" Save cpoptions
 let s:save_cpo = &cpoptions
 set cpoptions&vim
 
