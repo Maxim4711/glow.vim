@@ -1,0 +1,254 @@
+*glow.txt*    Markdown preview with glow                    *glow* *glow.vim*
+
+                                  GLOW.VIM
+                    Markdown preview with synchronized scrolling
+
+Author: Maxim4711
+License: MIT
+Version: 1.0
+
+==============================================================================
+CONTENTS                                                        *glow-contents*
+
+    1. Introduction ...................... |glow-introduction|
+    2. Installation ...................... |glow-installation|
+    3. Commands .......................... |glow-commands|
+    4. Configuration ..................... |glow-configuration|
+    5. Mappings .......................... |glow-mappings|
+    6. Functions ......................... |glow-functions|
+    7. Troubleshooting ................... |glow-troubleshooting|
+    8. Changelog ......................... |glow-changelog|
+
+==============================================================================
+1. INTRODUCTION                                             *glow-introduction*
+
+glow.vim is a Vim plugin that provides live Markdown preview using the `glow`
+terminal markdown reader. It displays the rendered markdown in a synchronized
+vertical split window.
+
+This plugin is a Vimscript reimplementation of the original concept from
+glow.nvim (https://github.com/ellisonleao/glow.nvim), adapted for classic Vim.
+
+Requirements:
+    - Vim 8.0+ or Neovim
+    - glow binary (https://github.com/charmbracelet/glow)
+
+Features:
+    - Live preview in vertical split
+    - Synchronized scrolling between source and preview
+    - Auto-update on text changes
+    - Configurable glow settings
+    - Simple commands and key mappings
+
+==============================================================================
+2. INSTALLATION                                             *glow-installation*
+
+First, install the glow binary:
+
+macOS (Homebrew): >
+    brew install glow
+<
+
+Linux: >
+    # Arch Linux
+    sudo pacman -S glow
+    
+    # Ubuntu/Debian
+    sudo snap install glow
+<
+
+Windows:
+    Download from: https://github.com/charmbracelet/glow/releases
+
+Then install the plugin using your preferred method:
+
+vim-plug: >
+    Plug 'your-username/glow.vim'
+<
+
+Vundle: >
+    Plugin 'your-username/glow.vim'
+<
+
+Manual installation:
+    Copy plugin files to your Vim configuration directory.
+
+==============================================================================
+3. COMMANDS                                                     *glow-commands*
+
+:GlowToggle                                                      *:GlowToggle*
+    Toggle the markdown preview window. If the preview is open, it will be
+    closed. If closed, it will be opened with the current buffer content.
+
+:GlowOpen                                                          *:GlowOpen*
+    Open the markdown preview window. If already open, this command has no
+    effect.
+
+:GlowClose                                                        *:GlowClose*
+    Close the markdown preview window. If not open, this command has no
+    effect.
+
+:GlowToggleSync                                              *:GlowToggleSync*
+    Toggle scroll synchronization between the source buffer and preview
+    window. When enabled, the preview will automatically scroll to match
+    the relative position of the cursor in the source buffer.
+
+==============================================================================
+4. CONFIGURATION                                           *glow-configuration*
+
+                                                          *g:glow_binary_path*
+g:glow_binary_path~
+    Default: 'glow'
+    
+    Path to the glow binary. Set this if glow is not in your PATH or if you
+    want to use a specific version.
+    
+    Example: >
+        let g:glow_binary_path = '/usr/local/bin/glow'
+<
+
+                                                               *g:glow_width*
+g:glow_width~
+    Default: 80
+    
+    Width of the rendered markdown in characters. This affects how glow
+    formats the output.
+    
+    Example: >
+        let g:glow_width = 100
+<
+
+                                                               *g:glow_style*
+g:glow_style~
+    Default: 'auto'
+    
+    Color theme for glow rendering. Available options:
+    - 'auto': Automatically detect terminal theme
+    - 'dark': Dark theme
+    - 'light': Light theme  
+    - 'notty': Plain text without colors
+    
+    Example: >
+        let g:glow_style = 'dark'
+<
+
+                                                               *g:glow_pager*
+g:glow_pager~
+    Default: 0
+    
+    Enable pager mode in glow. When enabled, glow will display content
+    in pager-style format.
+    
+    Example: >
+        let g:glow_pager = 1
+<
+
+                                                  *g:glow_sync_scroll*
+g:glow_sync_scroll~
+    Default: 1
+    
+    Enable scroll synchronization by default. When enabled, the preview
+    window will automatically scroll to match cursor position in source.
+    
+    Example: >
+        let g:glow_sync_scroll = 0
+<
+
+                                         *g:glow_disable_default_mappings*
+g:glow_disable_default_mappings~
+    Default: 0
+    
+    Disable the default key mappings. Set this to 1 if you want to define
+    your own mappings.
+    
+    Example: >
+        let g:glow_disable_default_mappings = 1
+<
+
+==============================================================================
+5. MAPPINGS                                                     *glow-mappings*
+
+Default mappings (when g:glow_disable_default_mappings is not set):
+
+<Leader>p                                                       *glow-<Leader>p*
+    Toggle the markdown preview window. Equivalent to :GlowToggle.
+
+<Leader>P                                                       *glow-<Leader>P*
+    Toggle scroll synchronization. Equivalent to :GlowToggleSync.
+
+Custom mappings example: >
+    " Disable default mappings
+    let g:glow_disable_default_mappings = 1
+    
+    " Create custom mappings
+    nnoremap <silent> <F5> :GlowToggle<CR>
+    nnoremap <silent> <F6> :GlowToggleSync<CR>
+<
+
+==============================================================================
+6. FUNCTIONS                                                   *glow-functions*
+
+glow#toggle()                                                   *glow#toggle()*
+    Toggle the preview window. Returns 1 if opened, 0 if closed.
+
+glow#open()                                                       *glow#open()*
+    Open the preview window. Returns 1 if successful, 0 otherwise.
+
+glow#close()                                                     *glow#close()*
+    Close the preview window. Returns 1 if closed, 0 if was not open.
+
+glow#toggle_sync()                                         *glow#toggle_sync()*
+    Toggle scroll synchronization. Returns current sync state (1 or 0).
+
+glow#is_open()                                                 *glow#is_open()*
+    Check if preview window is open. Returns 1 if open, 0 otherwise.
+
+glow#update()                                                   *glow#update()*
+    Manually update the preview content.
+
+Example usage: >
+    " Open preview if markdown file
+    if &filetype == 'markdown'
+        call glow#open()
+    endif
+<
+
+==============================================================================
+7. TROUBLESHOOTING                                         *glow-troubleshooting*
+
+Problem: "Glow binary not found" error
+Solution: Install glow or set the correct path: >
+    let g:glow_binary_path = '/path/to/glow'
+<
+
+Problem: Preview not updating automatically
+Solution: 
+    - Ensure you're editing a .md file
+    - Check glow is executable: :!which glow
+    - Try manual refresh: :GlowClose then :GlowOpen
+
+Problem: Scroll synchronization not working
+Solution:
+    - Check both windows are visible
+    - Toggle sync: :GlowToggleSync (twice to reset)
+    - Verify g:glow_sync_scroll is set to 1
+
+Problem: Preview window layout issues
+Solution:
+    - Try closing and reopening: :GlowToggle (twice)
+    - Check terminal/Vim window size
+    - Adjust g:glow_width setting
+
+==============================================================================
+8. CHANGELOG                                                   *glow-changelog*
+
+1.0 (2024-12-XX)
+    - Initial release
+    - Vertical split preview with glow
+    - Synchronized scrolling
+    - Auto-update on changes
+    - Configurable options
+    - Complete documentation
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
