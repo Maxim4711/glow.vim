@@ -1,4 +1,4 @@
-i" glow.vim - Markdown preview with glow in vertical split
+" glow.vim - Markdown preview with glow in vertical split
 " Author: Maxim4711
 " Version: 1.0
 " License: MIT
