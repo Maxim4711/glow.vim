@@ -1,4 +1,4 @@
-i" glow.vim - Markdown preview with glow in vertical split
+" glow.vim - Markdown preview with glow in vertical split
 " Author: Maxim4711
 " Version: 1.0
 " License: MIT
@@ -34,6 +34,14 @@ endif
 
 if !exists('g:glow_sync_scroll')
     let g:glow_sync_scroll = 1
+endif
+
+if !exists('g:glow_use_colors')
+    let g:glow_use_colors = 0
+endif
+
+if !exists('g:glow_render_colors')
+    let g:glow_render_colors = 0
 endif
 
 " Commands

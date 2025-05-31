@@ -15,7 +15,7 @@ CONTENTS                                                        *glow-contents*
     3. Commands .......................... |glow-commands|
     4. Configuration ..................... |glow-configuration|
     5. Mappings .......................... |glow-mappings|
-    6. Functions ......................... |glow-functions|
+    6. Color Rendering ................... |glow-colors|
     7. Troubleshooting ................... |glow-troubleshooting|
     8. Changelog ......................... |glow-changelog|
 
@@ -24,21 +24,24 @@ CONTENTS                                                        *glow-contents*
 
 glow.vim is a Vim plugin that provides live Markdown preview using the `glow`
 terminal markdown reader. It displays the rendered markdown in a synchronized
-vertical split window.
+vertical split window with beautiful color highlighting.
 
 This plugin is a Vimscript reimplementation of the original concept from
-glow.nvim (https://github.com/ellisonleao/glow.nvim), adapted for classic Vim.
+glow.nvim (https://github.com/ellisonleao/glow.nvim), adapted for classic Vim
+with enhanced color rendering capabilities.
 
 Requirements:
     - Vim 8.0+ or Neovim
     - glow binary (https://github.com/charmbracelet/glow)
+    - `set termguicolors` for color support
 
 Features:
     - Live preview in vertical split
+    - Custom ANSI color renderer
     - Synchronized scrolling between source and preview
     - Auto-update on text changes
-    - Configurable glow settings
-    - Simple commands and key mappings
+    - Rich syntax highlighting for all markdown elements
+    - Pure Vimscript implementation (no external dependencies)
 
 ==============================================================================
 2. INSTALLATION                                             *glow-installation*
@@ -63,11 +66,11 @@ Windows:
 Then install the plugin using your preferred method:
 
 vim-plug: >
-    Plug 'your-username/glow.vim'
+    Plug 'Maxim4711/glow.vim'
 <
 
 Vundle: >
-    Plugin 'your-username/glow.vim'
+    Plugin 'Maxim4711/glow.vim'
 <
 
 Manual installation:
@@ -124,7 +127,7 @@ g:glow_style~
     
     Color theme for glow rendering. Available options:
     - 'auto': Automatically detect terminal theme
-    - 'dark': Dark theme
+    - 'dark': Dark theme with bright colors
     - 'light': Light theme  
     - 'notty': Plain text without colors
     
@@ -143,7 +146,7 @@ g:glow_pager~
         let g:glow_pager = 1
 <
 
-                                                  *g:glow_sync_scroll*
+                                                        *g:glow_sync_scroll*
 g:glow_sync_scroll~
     Default: 1
     
@@ -152,6 +155,31 @@ g:glow_sync_scroll~
     
     Example: >
         let g:glow_sync_scroll = 0
+<
+
+                                                         *g:glow_use_colors*
+g:glow_use_colors~
+    Default: 0
+    
+    Enable colored output from glow. When enabled, glow will generate ANSI
+    color sequences that can be rendered by the custom ANSI renderer.
+    
+    Example: >
+        let g:glow_use_colors = 1
+<
+
+                                                      *g:glow_render_colors*
+g:glow_render_colors~
+    Default: 0
+    
+    Enable color rendering in Vim buffers using the built-in ANSI renderer.
+    When enabled, parses ANSI escape sequences from glow and applies them
+    as Vim highlighting groups. Requires termguicolors and g:glow_use_colors.
+    
+    Example: >
+        set termguicolors
+        let g:glow_use_colors = 1
+        let g:glow_render_colors = 1
 <
 
                                          *g:glow_disable_default_mappings*
@@ -186,32 +214,42 @@ Custom mappings example: >
 <
 
 ==============================================================================
-6. FUNCTIONS                                                   *glow-functions*
+6. COLOR RENDERING                                               *glow-colors*
 
-glow#toggle()                                                   *glow#toggle()*
-    Toggle the preview window. Returns 1 if opened, 0 if closed.
+glow.vim features a custom ANSI renderer built in pure Vimscript that provides
+rich color highlighting for markdown elements without external dependencies.
 
-glow#open()                                                       *glow#open()*
-    Open the preview window. Returns 1 if successful, 0 otherwise.
+Color Scheme:                                             *glow-color-scheme*
 
-glow#close()                                                     *glow#close()*
-    Close the preview window. Returns 1 if closed, 0 if was not open.
+The renderer applies different colors to markdown elements:
 
-glow#toggle_sync()                                         *glow#toggle_sync()*
-    Toggle scroll synchronization. Returns current sync state (1 or 0).
+    Headers (#, ##, ###)     → Bright red/pink with bold formatting
+    Bold text (**text**)     → Bright green with bold formatting
+    Italic text (*text*)     → Light blue with italic formatting  
+    Code blocks (`code`)     → Yellow highlighting
+    Links ([text](url))      → Purple with underline
 
-glow#is_open()                                                 *glow#is_open()*
-    Check if preview window is open. Returns 1 if open, 0 otherwise.
+Configuration:                                          *glow-color-configuration*
 
-glow#update()                                                   *glow#update()*
-    Manually update the preview content.
-
-Example usage: >
-    " Open preview if markdown file
-    if &filetype == 'markdown'
-        call glow#open()
-    endif
+To enable color rendering: >
+    set termguicolors
+    let g:glow_use_colors = 1
+    let g:glow_render_colors = 1
 <
+
+The color renderer:
+    - Parses glow's ANSI sequences in real-time
+    - Maps formatting to appropriate Vim highlight groups
+    - Handles complex sequences like ;;1m that other tools struggle with
+    - Provides consistent colors across different terminals and colorschemes
+
+Performance:                                              *glow-color-performance*
+
+The ANSI renderer is optimized for performance:
+    - Only processes visible content
+    - Uses efficient Vim highlighting APIs
+    - No external command execution
+    - Minimal memory overhead
 
 ==============================================================================
 7. TROUBLESHOOTING                                         *glow-troubleshooting*
@@ -219,6 +257,13 @@ Example usage: >
 Problem: "Glow binary not found" error
 Solution: Install glow or set the correct path: >
     let g:glow_binary_path = '/path/to/glow'
+<
+
+Problem: No colors in preview
+Solution: Enable termguicolors and color rendering: >
+    set termguicolors
+    let g:glow_use_colors = 1
+    let g:glow_render_colors = 1
 <
 
 Problem: Preview not updating automatically
@@ -233,22 +278,30 @@ Solution:
     - Toggle sync: :GlowToggleSync (twice to reset)
     - Verify g:glow_sync_scroll is set to 1
 
-Problem: Preview window layout issues
+Problem: Colors look wrong or inconsistent
 Solution:
-    - Try closing and reopening: :GlowToggle (twice)
-    - Check terminal/Vim window size
-    - Adjust g:glow_width setting
+    - Verify termguicolors is enabled: :set termguicolors?
+    - Check your colorscheme compatibility
+    - Try different glow styles: let g:glow_style = 'dark'
+
+Problem: Performance issues with large files
+Solution:
+    - Disable color rendering for large files: let g:glow_render_colors = 0
+    - Use plain glow output: let g:glow_use_colors = 0
+    - Reduce preview width: let g:glow_width = 60
 
 ==============================================================================
 8. CHANGELOG                                                   *glow-changelog*
 
-1.0 (2024-12-XX)
+1.0 (2025-05-31)
     - Initial release
     - Vertical split preview with glow
+    - Custom ANSI color renderer
     - Synchronized scrolling
     - Auto-update on changes
-    - Configurable options
-    - Complete documentation
+    - Complete Vimscript implementation
+    - Rich color highlighting for all markdown elements
+    - Pure Vim solution with no external dependencies
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:
